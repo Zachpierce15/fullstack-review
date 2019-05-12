@@ -13,6 +13,13 @@ class App extends React.Component {
     this.search = this.search.bind(this);
   }
 
+  componentDidMount() {
+    $.get('http://localhost:1128/repos', (data) => {
+        console.log('GET request successful!')
+        console.log(JSON.parse(data))
+        this.setState({repos: JSON.parse(data)});
+    });
+  }
   search (term) {
     console.log(`${term} was searched`);
     $.ajax({
@@ -20,8 +27,11 @@ class App extends React.Component {
       url: 'http://localhost:1128/repos',
       data: {name: term},
       dataType: 'json',
-      success: (results) => {
-        console.log('here is you results', results)
+      success: () => {
+        $.get('http://localhost:1128/repos', (data) => {
+          console.log('GET request successful!')
+          this.setState({repos: JSON.parse(data)});
+      });
       }, 
       error: (error) => {
         console.log('You have an error',error)
@@ -34,6 +44,7 @@ class App extends React.Component {
       <h1>Github Fetcher</h1>
       <Search onSearch={this.search.bind(this)}/>
       <RepoList repos={this.state.repos}/>
+      <div>There are {this.state.repos.length} repos.</div>
     </div>)
   }
 }
